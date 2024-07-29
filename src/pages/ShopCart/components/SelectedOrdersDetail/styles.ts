@@ -40,7 +40,7 @@ export const Description = styled.div`
   color: ${({ theme }) => theme.baseText};
 `
 
-export const InputColumn = styled.div`
+export const InputBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -55,12 +55,13 @@ export const InpuRow = styled.div`
   }
 `
 
-export const Input = styled.input<{ width?: string }>`
+export const Input = styled.input<{ width?: string; hasError?: boolean }>`
   display: flex;
   align-items: center;
   width: ${({ width }) => width};
   padding: 0px 10px;
   border: 1px solid transparent;
+  border-color: ${({ hasError }) => hasError && 'red'};
   height: 2.625rem;
   border-radius: 6px;
   background-color: ${({ theme }) => theme.baseInput};
@@ -84,7 +85,7 @@ export const PaymentOptionsRow = styled.div`
   gap: 12px;
 `
 
-export const PaymentOptionButton = styled.button`
+export const PaymentOptionButton = styled.button<{ isSelected: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -94,14 +95,12 @@ export const PaymentOptionButton = styled.button`
   height: 50px;
   width: 180px;
   gap: 10px;
+  border-color: ${({ isSelected, theme }) => isSelected && theme.purple};
   color: ${({ theme }) => theme.baseText};
   background-color: ${({ theme }) => theme.baseButton};
+  transition: all 0.5s;
 
   &:hover {
     background-color: ${({ theme }) => theme.baseHover};
-  }
-
-  &:focus {
-    border-color: ${({ theme }) => theme.purple};
   }
 `

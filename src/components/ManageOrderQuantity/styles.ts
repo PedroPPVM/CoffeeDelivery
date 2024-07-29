@@ -22,4 +22,9 @@ export const IconButton = styled.button`
   &:hover {
     color: ${({ theme }) => theme.purpleDark};
   }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: ${({ theme }) => theme.baseText};
+  }
 `

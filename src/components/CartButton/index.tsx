@@ -1,32 +1,25 @@
 import { ShoppingCart } from '@phosphor-icons/react'
 import * as S from './styles'
-import { FC, useMemo } from 'react'
+import { ButtonHTMLAttributes, FC } from 'react'
 
-interface CartButtonProps {
-  iconColor: string
+interface CartButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   backgroundColor: string
+  onClick?: () => void
   hoverBackground?: string
-  hasQuantityIndicator?: boolean
+  hasQuantityIndicator?: number
 }
 
-export const CartButton: FC<CartButtonProps> = ({
-  iconColor,
-  backgroundColor,
-  hoverBackground,
-  hasQuantityIndicator = false,
-}) => {
-  const ordersCount = useMemo(() => 10, [])
-
+export const CartButton: FC<CartButtonProps> = (props) => {
   return (
     <S.ButtonContainer
-      onClick={() => {}}
-      backcolor={backgroundColor}
-      hoverbackground={hoverBackground}
+      backcolor={props.backgroundColor}
+      hoverbackground={props.hoverBackground}
+      {...props}
     >
-      <ShoppingCart width={18} height={18} color={iconColor} weight="fill" />
+      <ShoppingCart width={18} height={18} weight="fill" />
 
-      {ordersCount > 0 && hasQuantityIndicator && (
-        <S.BoxCount>{ordersCount}</S.BoxCount>
+      {!!props.hasQuantityIndicator && (
+        <S.BoxCount>{props.hasQuantityIndicator}</S.BoxCount>
       )}
     </S.ButtonContainer>
   )

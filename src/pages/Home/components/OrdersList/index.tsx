@@ -9,6 +9,8 @@ import { CartButton } from '../../../../components/CartButton'
 import { useTheme } from 'styled-components'
 
 import * as S from './styles'
+import { useCallback, useContext, useState } from 'react'
+import { OrderContext } from '../../../../contexts/OrderContext'
 
 export const getImageByCoffe = (coffeName: string) => {
   switch (coffeName) {
@@ -31,26 +33,41 @@ export const getImageByCoffe = (coffeName: string) => {
 
 export const OrdersList = () => {
   const theme = useTheme()
+  const { addOrder } = useContext(OrderContext)
+  const [options, setOptions] = useState<Order.default[]>(ORDERS_MOCKUP)
+
+  const onUpdateOptionQuantity = useCallback(
+    (optionId: string, quantity: number) => {
+      const optionsUpdated = options.map((option) => {
+        if (option.id === optionId) return { ...option, quantity }
+
+        return option
+      })
+
+      setOptions(optionsUpdated)
+    },
+    [options],
+  )
 
   return (
     <S.Container>
       <S.MasterTitle>Nossos cafés</S.MasterTitle>
 
       <S.List>
-        {ORDERS_MOCKUP.map((order) => {
+        {options.map((option) => {
           return (
-            <S.OrderCard key={order.id}>
+            <S.OrderCard key={option.id}>
               <S.CardImage>
                 <img
                   width={120}
                   height={120}
-                  src={getImageByCoffe(order.name)}
+                  src={getImageByCoffe(option.name)}
                   alt=""
                 />
               </S.CardImage>
 
               <S.CharacteristicsTagsRow>
-                {order.characteristics.map((characteristic, index) => {
+                {option.characteristics.map((characteristic, index) => {
                   return (
                     <S.CharacteristicsTag key={`${characteristic}-${index}`}>
                       {characteristic}
@@ -59,9 +76,9 @@ export const OrdersList = () => {
                 })}
               </S.CharacteristicsTagsRow>
 
-              <S.CardTitle>{order.name}</S.CardTitle>
+              <S.CardTitle>{option.name}</S.CardTitle>
 
-              <S.CardDescription>{order.description}</S.CardDescription>
+              <S.CardDescription>{option.description}</S.CardDescription>
 
               <S.Footer>
                 <S.PriceAlignCenterRow>
@@ -69,16 +86,20 @@ export const OrdersList = () => {
                     <S.MoneySymbolLabel>R$</S.MoneySymbolLabel>
 
                     <S.PriceLabel>
-                      {order.price.toFixed(2).replace('.', ',')}
+                      {option.price.toFixed(2).replace('.', ',')}
                     </S.PriceLabel>
                   </S.PriceRow>
                 </S.PriceAlignCenterRow>
 
                 <S.FooterButtonsRow>
-                  <ManageOrderQuantity />
+                  <ManageOrderQuantity
+                    option={option}
+                    onUpdateOptionQuantity={onUpdateOptionQuantity}
+                  />
 
                   <CartButton
-                    iconColor={theme.white}
+                    onClick={() => addOrder(option)}
+                    color={theme.white}
                     backgroundColor={theme.purpleDark}
                     hoverBackground={theme.purple}
                   />
