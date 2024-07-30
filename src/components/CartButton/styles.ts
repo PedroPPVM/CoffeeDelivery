@@ -12,8 +12,15 @@ export const ButtonContainer = styled.button<{
   border-radius: 6px;
   cursor: pointer;
   border: none;
+  color: ${({ color }) => color};
   background-color: ${({ backcolor }) => backcolor};
   transition: 0.5s;
+
+  &:disabled {
+    cursor: not-allowed;
+    color: ${({ theme }) => theme.baseLabel};
+    background-color: ${({ theme }) => theme.baseButton};
+  }
 
   &:hover {
     background-color: ${({ hoverbackground }) =>

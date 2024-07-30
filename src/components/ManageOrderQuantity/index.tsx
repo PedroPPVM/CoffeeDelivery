@@ -1,16 +1,34 @@
 import { Minus, Plus } from '@phosphor-icons/react'
 import * as S from './styles'
+import { FC } from 'react'
 
-export const ManageOrderQuantity = () => {
+interface ManageOrderQuantityProps {
+  option: Order.default
+  onUpdateOptionQuantity: (orderId: string, quantity: number) => void
+}
+
+export const ManageOrderQuantity: FC<ManageOrderQuantityProps> = ({
+  option,
+  onUpdateOptionQuantity,
+}) => {
   return (
     <S.Container>
-      <S.IconButton>
+      <S.IconButton
+        disabled={option.quantity < 2}
+        onClick={() => {
+          onUpdateOptionQuantity(option.id, option.quantity - 1)
+        }}
+      >
         <Minus size={22} />
       </S.IconButton>
 
-      <div>1</div>
+      <div>{option.quantity}</div>
 
-      <S.IconButton>
+      <S.IconButton
+        onClick={() => {
+          onUpdateOptionQuantity(option.id, option.quantity + 1)
+        }}
+      >
         <Plus size={22} />
       </S.IconButton>
     </S.Container>

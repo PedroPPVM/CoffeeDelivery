@@ -3,8 +3,12 @@ import { ManageOrderQuantity } from '../../../../components/ManageOrderQuantity'
 import { getImageByCoffe } from '../../../Home/components/OrdersList'
 import * as S from './styles'
 import { Trash } from '@phosphor-icons/react'
-import { useMemo } from 'react'
-import { NavLink } from 'react-router-dom'
+import { useContext, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+  DeliveryAddressProps,
+  OrderContext,
+} from '../../../../contexts/OrderContext'
 
 const formatPrice = (value: number) => {
   return value.toFixed(2).replace('.', ',')
@@ -12,27 +16,23 @@ const formatPrice = (value: number) => {
 
 export const SelectedOrdersResume = () => {
   const theme = useTheme()
-
-  const selectedOrders = [
-    {
-      id: 1,
-      name: 'Expresso Tradicional',
-      price: 9.9,
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: 'Expresso Americano',
-      price: 9.9,
-      quantity: 2,
-    },
-  ]
+  const navigate = useNavigate()
+  const {
+    orders,
+    paymentType,
+    removeOrder,
+    onUpdateOrderQuantity,
+    clearAllOrder,
+    handleSubmit,
+    reset,
+    onUpdateDeliveryAddress,
+  } = useContext(OrderContext)
 
   const totalItemsPrice = useMemo(() => {
-    return selectedOrders.reduce((acc, curr) => {
+    return orders.reduce((acc, curr) => {
       return (acc += curr.quantity * curr.price)
     }, 0)
-  }, [])
+  }, [orders])
 
   const deliveryPrice = useMemo(() => {
     return 3.5
@@ -42,13 +42,24 @@ export const SelectedOrdersResume = () => {
     return totalItemsPrice + deliveryPrice
   }, [totalItemsPrice, deliveryPrice])
 
+  useEffect(() => {
+    if (orders.length === 0) navigate('/')
+  }, [])
+
+  const handleConfirmOrder = (data: DeliveryAddressProps) => {
+    clearAllOrder()
+    onUpdateDeliveryAddress(data)
+    reset()
+    navigate('/order-confirmed')
+  }
+
   return (
     <S.Container>
       <S.MasterTitle>Cafés selecionados</S.MasterTitle>
 
       <S.Box>
         <S.OrdersList>
-          {selectedOrders.map((selectedOrder) => (
+          {orders.map((selectedOrder) => (
             <S.OrderBox key={selectedOrder.id}>
               <S.OrderRow>
                 <img
@@ -62,9 +73,18 @@ export const SelectedOrdersResume = () => {
                   <S.Title>{selectedOrder.name}</S.Title>
 
                   <S.ManageOrderRow>
-                    <ManageOrderQuantity />
+                    <ManageOrderQuantity
+                      option={selectedOrder}
+                      onUpdateOptionQuantity={onUpdateOrderQuantity}
+                    />
 
-                    <S.DeleteButton>
+                    <S.DeleteButton
+                      onClick={() => {
+                        removeOrder(selectedOrder.id)
+
+                        if (orders.length === 1) navigate('/')
+                      }}
+                    >
                       <Trash width={22} height={22} color={theme.purple} />
                       REMOVER
                     </S.DeleteButton>
@@ -115,9 +135,15 @@ export const SelectedOrdersResume = () => {
           </S.FinalPriceRow>
         </S.FinalPriceBox>
 
-        <NavLink to={'/order-confirmed'} style={{ textDecoration: 'none' }}>
-          <S.ConfirmButton onClick={() => {}}>CONFIRMAR PEDIDO</S.ConfirmButton>
-        </NavLink>
+        <S.ConfirmButton
+          title={
+            paymentType === null ? 'Campos obrigatórios não preenchidos!' : ''
+          }
+          disabled={paymentType === null}
+          onClick={handleSubmit(handleConfirmOrder)}
+        >
+          CONFIRMAR PEDIDO
+        </S.ConfirmButton>
       </S.Box>
     </S.Container>
   )
